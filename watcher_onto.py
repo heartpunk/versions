@@ -1,5 +1,6 @@
 from uuid import uuid4
 from owlready2 import *
+from pathlib import Path
 
 owlready_builtin_datatypes = [int, float, bool, str]
 onto = get_ontology("https://github.com/heartpunk/versions/ontology.owl")
@@ -17,7 +18,7 @@ with onto:
         pass
     class Snapshot(Thing):
         pass
-    default_world.set_backend(filename = "/Users/heartpunk/.watcher/" + session_uuid + ".sqlite3", exclusive=False)
+    default_world.set_backend(filename = str(Path.home() / ".watcher") + session_uuid + ".sqlite3", exclusive=False)
     default_world.save()
 
 property_type('files', Snapshot, File)

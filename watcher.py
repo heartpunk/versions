@@ -3,13 +3,14 @@ import pywatchman
 from functools import reduce
 from glob import glob
 from sys import argv
+from pathlib import Path
 from uuid import uuid4
 import types
 from watcher_onto import *
 
 
 path = argv[1]
-snapshot_path = '/Users/heartpunk/.snapshots/'
+snapshot_path = str(Path.home() / '.snapshots')
 try:
     os.mkdir(snapshot_path)
 except FileExistsError:
