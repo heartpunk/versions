@@ -79,7 +79,7 @@ def update_file_handler(file):
 if __name__ == '__main__':
     with pywatchman.client() as c:
         c.query("watch-project", path)
-        c.query("subscribe", path, "foooo", {})
+        c.query("subscribe", path, "foooo", {'fields': ['name', 'exists', 'cclock', 'oclock', 'ctime', 'ctime_ms', 'ctime_us', 'ctime_ns', 'ctime_f', 'mtime', 'mtime_ms', 'mtime_us', 'mtime_ns', 'mtime_f', 'size', 'mode', 'uid', 'gid', 'ino', 'dev', 'nlink', 'new', 'type', 'symlink_target', 'content.sha1hex']})
         while True:
             try:
                 update = c.receive()
