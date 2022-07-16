@@ -10,7 +10,7 @@ from watcher_onto import *
 
 
 path = argv[1]
-snapshot_path = str(Path.home() / '.snapshots')
+snapshot_path =  Path.home() / '.snapshots'
 try:
     os.mkdir(snapshot_path)
 except FileExistsError:
@@ -36,14 +36,14 @@ def update_handler(update):
                             file_uuid = str(uuid4())
                             file = File(file_uuid)
                             file.uuid4.append(file_uuid)
-                            
+
                             sha256 = update_file_handler(item)
                             if type(sha256) != str:
                                 continue
                             property_type('sha256', Thing, str)
                             file.sha256.append(sha256)
                             thing.files.append(file)
-                
+
                             for subkey, subval in item.items():
                                 #setattr(getattr(thing, key), 'append', file)
                                 #print("setattr(%s, %s, %s)" % (file, subkey, subval))
@@ -64,7 +64,7 @@ def update_file_handler(file):
 
             print(hashlib.sha256(contents).hexdigest(), file)
 
-            with open(snapshot_path + hashlib.sha256(contents).hexdigest(), 'wb') as new_file:
+            with open(snapshot_path / hashlib.sha256(contents).hexdigest(), 'wb') as new_file:
                 new_file.write(contents)
 
             return hashlib.sha256(contents).hexdigest()

@@ -18,7 +18,7 @@ with onto:
         pass
     class Snapshot(Thing):
         pass
-    default_world.set_backend(filename = str(Path.home() / ".watcher") + session_uuid + ".sqlite3", exclusive=False)
+    default_world.set_backend(filename = (str(Path.home() / ".watcher" / session_uuid) + ".sqlite3"), exclusive=False)
     default_world.save()
 
 property_type('files', Snapshot, File)
