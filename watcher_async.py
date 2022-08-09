@@ -1,18 +1,17 @@
 import hashlib
-import pywatchman
+from ..watchman.python import pywatchman
+from ..watchman.python.pywatchman.aioclient import AIOClient as WatchmanClient
 from functools import reduce
 from glob import glob
 from sys import argv
 from pathlib import Path
 from uuid import uuid4
 import types
-import watcher_onto
-
-watcher_onto.start_session()
+from watcher_onto import *
 
 
 path = argv[1]
-snapshot_path =  Path.home() / '.snapshots'
+snapshot_path = str(Path.home() / '.snapshots')
 try:
     os.mkdir(snapshot_path)
 except FileExistsError:
@@ -66,7 +65,7 @@ def update_file_handler(file):
 
             print(hashlib.sha256(contents).hexdigest(), file)
 
-            with open(snapshot_path / hashlib.sha256(contents).hexdigest(), 'wb') as new_file:
+            with open(snapshot_path + hashlib.sha256(contents).hexdigest(), 'wb') as new_file:
                 new_file.write(contents)
 
             return hashlib.sha256(contents).hexdigest()
@@ -79,8 +78,7 @@ def update_file_handler(file):
 
 
 if __name__ == '__main__':
-    # run the watchman client update processing loop
-    with pywatchman.client() as c:
+    with WatchmanClient() as c:
         c.query("watch-project", path)
         c.query("subscribe", path, "foooo", {'fields': ['name', 'exists', 'cclock', 'oclock', 'ctime', 'ctime_ms', 'ctime_us', 'ctime_ns', 'ctime_f', 'mtime', 'mtime_ms', 'mtime_us', 'mtime_ns', 'mtime_f', 'size', 'mode', 'uid', 'gid', 'ino', 'dev', 'nlink', 'new', 'type', 'symlink_target', 'content.sha1hex']})
         while True:

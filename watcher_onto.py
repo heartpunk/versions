@@ -4,7 +4,7 @@ from pathlib import Path
 
 owlready_builtin_datatypes = [int, float, bool, str]
 onto = get_ontology("https://github.com/heartpunk/versions/ontology.owl")
-session_uuid = str(uuid4())
+
 
 
 def property_type(name, d, r):
@@ -13,13 +13,20 @@ def property_type(name, d, r):
         default_world.save()
         return klass
 
-with onto:
+def sqlite_path(session_uuid):
+    return str(Path.home() / ".watcher" / session_uuid) + ".sqlite3"
+
+def python_owlready_entity_classes():
     class File(Thing):
         pass
     class Snapshot(Thing):
         pass
-    default_world.set_backend(filename = (str(Path.home() / ".watcher" / session_uuid) + ".sqlite3"), exclusive=False)
-    default_world.save()
+    property_type('files', Snapshot, File)
+    property_type('uuid4', Thing, str)
 
-property_type('files', Snapshot, File)
-property_type('uuid4', Thing, str)
+def start_session():
+    python_owlready_entity_classes()
+    session_uuid = str(uuid4())
+    default_world.set_backend(filename=sqlite_path(session_uuid), exclusive=False)
+    default_world.save()
+    return session_uuid
