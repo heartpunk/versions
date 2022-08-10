@@ -16,11 +16,12 @@ def property_type(name, d, r):
 def sqlite_path(session_uuid):
     return str(Path.home() / ".watcher" / session_uuid) + ".sqlite3"
 
+class File(Thing):
+    pass
+class Snapshot(Thing):
+    pass
+
 def python_owlready_entity_classes():
-    class File(Thing):
-        pass
-    class Snapshot(Thing):
-        pass
     property_type('files', Snapshot, File)
     property_type('uuid4', Thing, str)
 

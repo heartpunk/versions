@@ -6,6 +6,7 @@ from owlready2 import *
 import watcher_onto
 import werkzeug.serving
 import flask
+from uuid import uuid4
 
 SESSION_UUID = watcher_onto.start_session()
 
@@ -21,26 +22,26 @@ def start_endpoint(sqlite_file_path):
 def update_handler(update):
     if 'files' in update:
         uuid = str(uuid4())
-        thing = Snapshot(uuid)
+        thing = watcher_onto.Snapshot(uuid)
         thing.uuid4.append(uuid)
 
         for key, value in update.items():
             with onto:
-                if type(value) in owlready_builtin_datatypes:
-                    property_type(key, Snapshot, type(value))
+                if type(value) in watcher_onto.owlready_builtin_datatypes:
+                    watcher_onto.property_type(key, watcher_onto.Snapshot, type(value))
                     #print("setattr(%s, %s, %s)" % (thing, key, value))
                     getattr(thing, key).append(value)
                 elif type(value) == list and key == 'files':
                     for i, item in enumerate(value):
                         if type(item) == dict:
                             file_uuid = str(uuid4())
-                            file = File(file_uuid)
+                            file = watcher_onto.File(file_uuid)
                             file.uuid4.append(file_uuid)
 
                             sha256 = update_file_handler(item)
                             if type(sha256) != str:
                                 continue
-                            property_type('sha256', Thing, str)
+                            watcher_onto.property_type('sha256', Thing, str)
                             file.sha256.append(sha256)
                             thing.files.append(file)
 
@@ -56,8 +57,27 @@ def update_handler(update):
     else:
         print("update with no 'files' entry ", update)
 
+def update_file_handler(file):
+    try:
+        with open(path + '/' + file['name'], 'r') as f:
+            contents = f.read().encode('utf8')
+
+            print(hashlib.sha256(contents).hexdigest(), file)
+
+            with open(snapshot_path / hashlib.sha256(contents).hexdigest(), 'wb') as new_file:
+                new_file.write(contents)
+
+            return hashlib.sha256(contents).hexdigest()
+    except IsADirectoryError:
+        pass
+    except UnicodeDecodeError:
+        pass
+    except FileNotFoundError:
+        pass
+
 # a function to run the watchman query loop
 def watchman_loop(path, update_handler=update_handler, *args, **kwargs):
+    print("path: " + path)
     # pretty print the index and type of each argument
     for i, arg in enumerate(args):
         print("arg %d: %s" % (i, type(arg)))
@@ -82,8 +102,9 @@ def watchman_loop(path, update_handler=update_handler, *args, **kwargs):
 if __name__ == '__main__':
     # get the path to watch from the first command line argument
     path = sys.argv[1]
+    print(path)
     # create a process to run the watchman client
-    watcher = multiprocessing.Process(target=watchman_loop, args=(path))
+    watcher = multiprocessing.Process(target=watchman_loop, args=(path,))
     watcher.start()
     # start the sparql endpoint in another process
     server = multiprocessing.Process(target=start_endpoint, args=(watcher_onto.sqlite_path(SESSION_UUID),))
