@@ -120,6 +120,8 @@
                 HOME = "/var/lib/versions";
               };
               
+              path = [ pkgs.watchman ];
+              
               serviceConfig = {
                 Type = "simple";
                 User = cfg.user;
