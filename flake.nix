@@ -33,7 +33,7 @@
           pname = "versions";
           version = "1.0.0";
           
-          src = ./.;
+          src = self;
           
           buildInputs = [ pythonEnv ];
           
