@@ -1,4 +1,5 @@
 import hashlib
+import os
 import pywatchman
 from functools import reduce
 from glob import glob
@@ -7,8 +8,14 @@ from pathlib import Path
 from uuid import uuid4
 import types
 import watcher_onto
+from watcher_onto import onto, owlready_builtin_datatypes, default_world, property_type
 
 watcher_onto.start_session()
+
+# Import after start_session creates them
+from owlready2 import Thing
+Snapshot = onto.Snapshot
+File = onto.File
 
 
 path = argv[1]

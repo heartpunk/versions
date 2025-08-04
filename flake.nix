@@ -11,14 +11,17 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         
-        pythonEnv = pkgs.python3.withPackages (ps: with ps; [
+        pythonEnv = pkgs.python311.withPackages (ps: with ps; [
           (ps.buildPythonPackage rec {
-            pname = "owlready2";
+            pname = "Owlready2";
             version = "0.38";
             src = ps.fetchPypi {
               inherit pname version;
-              sha256 = "sha256-n7afRw7FpFp9TQo5exq5OeCUBNRLkT1vcno6Kn9l8n0=";
+              sha256 = "sha256-DROEH8nS8QkbB/0PhYSIMChuYGU9S2S5LkThMCSz6/w=";
             };
+            pyproject = true;
+            build-system = [ ps.setuptools ps.wheel ];
+            nativeBuildInputs = [ ps.setuptools ps.wheel ];
             doCheck = false;
           })
           pywatchman
@@ -122,11 +125,13 @@
                 User = cfg.user;
                 Group = cfg.group;
                 ExecStart = "${self.packages.${pkgs.system}.default}/bin/versions ${cfg.watchPath}";
+                ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p /var/lib/versions/.watcher /var/lib/versions/.snapshots";
                 Restart = "always";
                 RestartSec = 10;
+                WorkingDirectory = "/var/lib/versions";
                 
                 # Create necessary directories
-                StateDirectory = "versions versions/snapshots";
+                StateDirectory = "versions";
                 StateDirectoryMode = "0750";
               };
             };

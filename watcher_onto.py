@@ -1,6 +1,7 @@
 from uuid import uuid4
 from owlready2 import *
 from pathlib import Path
+import types
 
 owlready_builtin_datatypes = [int, float, bool, str]
 onto = get_ontology("https://github.com/heartpunk/versions/ontology.owl")
@@ -27,6 +28,11 @@ def python_owlready_entity_classes():
 def start_session():
     python_owlready_entity_classes()
     session_uuid = str(uuid4())
+    
+    # Ensure the .watcher directory exists
+    watcher_dir = Path.home() / ".watcher"
+    watcher_dir.mkdir(exist_ok=True)
+    
     default_world.set_backend(filename=sqlite_path(session_uuid), exclusive=False)
     default_world.save()
     return session_uuid
