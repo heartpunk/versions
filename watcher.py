@@ -14,8 +14,14 @@ watcher_onto.start_session()
 
 # Import after start_session creates them
 from owlready2 import Thing
-Snapshot = onto.Snapshot
-File = onto.File
+
+# Get the classes from the ontology
+def get_onto_classes():
+    global Snapshot, File
+    Snapshot = onto.Snapshot
+    File = onto.File
+
+get_onto_classes()
 
 
 path = argv[1]
