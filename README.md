@@ -21,12 +21,21 @@ Add to your flake inputs:
 
 Enable in configuration:
 ```nix
-# NixOS
+# NixOS - Multi-user setup
 {
   imports = [ versions.nixosModules.default ];
-  services.versions = {
-    enable = true;
-    watchPath = "/home/user/projects";
+  services.versions.perUserServices = {
+    heartpunk = {
+      enable = true;
+      watchPaths = [ "/home/heartpunk/code" ];
+    };
+    alice = {
+      enable = true;
+      watchPaths = [ 
+        "/home/alice/projects" 
+        "/home/alice/documents"
+      ];
+    };
   };
 }
 
