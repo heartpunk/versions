@@ -105,6 +105,12 @@
           };
           
           config = mkIf (cfg.perUserServices != {}) {
+            # Increase inotify limits for watchman
+            boot.kernel.sysctl = {
+              "fs.inotify.max_user_watches"   = 1048576;  # default 8192
+              "fs.inotify.max_user_instances" = 8192;     # default 128
+            };
+            
             # Create a user service for each user with versions enabled
             systemd.services = mkMerge (
               flatten (mapAttrsToList (username: userCfg: 
